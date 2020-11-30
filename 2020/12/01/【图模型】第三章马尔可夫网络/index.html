@@ -1,0 +1,314 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>【图模型】第三章-马尔可夫网络 | NlsHeep</title><meta name="keywords" content="图模型,贝叶斯网络"><meta name="author" content="sheep"><meta name="copyright" content="sheep"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="第三章-马尔可夫网络 1 误解示例1.1 例子：​    有四个学生A,B,C,D，由于学校安排他们需要两两一组完成课程作业。因为各种原因只能有以下组合合适，分别是A和B，B和C，C和D以及D和A（理由是A和C合不来，B跟D刚刚结束了一段糟糕的恋情）。 ​    在这个例子中，课堂上教授有时候会偶尔发生口误，导致学生可能对概念产生误解，但是有的人可能自己看书就悟出了对的概念，有的还是记的错误的概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【图模型】第三章-马尔可夫网络">
+<meta property="og:url" content="http://example.com/2020/12/01/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%BB%9C/index.html">
+<meta property="og:site_name" content="NlsHeep">
+<meta property="og:description" content="第三章-马尔可夫网络 1 误解示例1.1 例子：​    有四个学生A,B,C,D，由于学校安排他们需要两两一组完成课程作业。因为各种原因只能有以下组合合适，分别是A和B，B和C，C和D以及D和A（理由是A和C合不来，B跟D刚刚结束了一段糟糕的恋情）。 ​    在这个例子中，课堂上教授有时候会偶尔发生口误，导致学生可能对概念产生误解，但是有的人可能自己看书就悟出了对的概念，有的还是记的错误的概念">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/12/01/BevL8YWIQlkKgjp.png">
+<meta property="article:published_time" content="2020-11-30T16:22:12.000Z">
+<meta property="article:modified_time" content="2020-11-30T16:25:23.040Z">
+<meta property="article:author" content="sheep">
+<meta property="article:tag" content="图模型">
+<meta property="article:tag" content="贝叶斯网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/12/01/BevL8YWIQlkKgjp.png"><link rel="shortcut icon" href="/img/icons8-sheep-96.png"><link rel="canonical" href="http://example.com/2020/12/01/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%BB%9C/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin="crossorigin"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  ClickShowText: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  justifiedGallery: {
+    js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+    css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-12-01 00:25:23'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/img/IMG_4725.JPG" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://i.loli.net/2020/12/01/BevL8YWIQlkKgjp.png)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">NlsHeep</a></span><span id="menus"><div id="search_button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/messageboard/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div></div><span class="close" id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></span></span></nav><div id="post-info"><h1 class="post-title">【图模型】第三章-马尔可夫网络</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-11-30T16:22:12.000Z" title="发表于 2020-12-01 00:22:12">2020-12-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-11-30T16:25:23.040Z" title="更新于 2020-12-01 00:25:23">2020-12-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%9B%BE%E6%A8%A1%E5%9E%8B/">图模型</a></span></div><div class="meta-secondline"> <span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>第三章-马尔可夫网络</p>
+<h1 id="1-误解示例"><a href="#1-误解示例" class="headerlink" title="1 误解示例"></a>1 误解示例</h1><h2 id="1-1-例子："><a href="#1-1-例子：" class="headerlink" title="1.1 例子："></a>1.1 例子：</h2><p>​    有四个学生A,B,C,D，由于学校安排他们需要两两一组完成课程作业。因为各种原因只能有以下组合合适，分别是A和B，B和C，C和D以及D和A（理由是A和C合不来，B跟D刚刚结束了一段糟糕的恋情）。</p>
+<p>​    在这个例子中，课堂上教授有时候会偶尔发生口误，导致学生可能对概念产生误解，但是有的人可能自己看书就悟出了对的概念，有的还是记的错误的概念。在课后讨论过程中，他们会讲自己的理解传递给自己的学习搭档。由此，存在表示学生是否对概念存在误解的四个二元随机变量。假定对每个$X\in{A,B,C,D}$，$x^1$表示这个学生对概念存在误解，$x^0$表示这个学生对概念不存在误解。</p>
+<p>​    由于A和C直接从不直接对话，因此A和C在给定B和D时独立。类似的，B和D在给定A和C时独立。那么我们可以用<strong>贝叶斯网络</strong>来描述这种情况吗？</p>
+<p><img src="https://i.loli.net/2020/11/30/eOVyI52X1lK9FmU.png" alt="image-20201130225936006"></p>
+<p>​    上图的(b)和(c)是两个我们试图用贝叶斯网表示该例子的尝试。</p>
+<p>​    在（b）中，我们可以看到，这个网络确实蕴含了在给定B，D时A与C相互独立。但是也暗示了只有在给定A时B，D才相互独立，同时给定A，C时B，D相互依赖。</p>
+<p>​    在（c）中，它不仅蕴含了$（A\perp C｜{B,D}）$,还蕴含了B与D边缘独立，不符合。</p>
+<p>​    很明显所有其他贝叶斯结构都存在瑕疵，因此该分布没有P-map。</p>
+<p>​    在该问题中，我们很容易发现变量之间的交互影响是对称的，因此，我们希望能够构建一种无需强行指定方向的模型来表示这种相互关系。</p>
+<p>​    所以我们现在引入一种无向图模型，也叫马尔可夫网。</p>
+<h2 id="1-2-无向图模型来描述该例"><a href="#1-2-无向图模型来描述该例" class="headerlink" title="1.2 无向图模型来描述该例"></a>1.2 无向图模型来描述该例</h2><p><img src="https://i.loli.net/2020/11/30/4E7ZtAKl8IaxLh3.png" alt="image-20201130230549545"></p>
+<p>​    根据学生A，B，C，D之间的关系我们很容易能够画出它们的无向图模型，那么现在我们有该模型了，该如何参数化呢？由于无向图的节点之间交互是无向的，因此我们就不能用给定一个节点时其他节点的条件概率来参数化。于是我们需要一种对称的参数化方法。下面将引出一系列无向图框架下的定义。</p>
+<h2 id="1-3-因子-factor"><a href="#1-3-因子-factor" class="headerlink" title="1.3 因子(factor)"></a>1.3 因子(factor)</h2><p>​    <strong>定义1：</strong>假定$D$表示随机变量的集合，<strong>因子$\phi$</strong>定义为从$Val(D)$映射到实数域$R$的一个函数。假如因子的所有表值均为非负，那么这个因子称为<strong>非负的</strong>（nonnegative）。变量集$D$称为因子的<strong>割域</strong>，记为$Scope[\phi]$。</p>
+<p>​    除非另行说明，我们只关注非负因子。</p>
+<p><img src="https://i.loli.net/2020/11/30/j3XlkKftoeC8QIE.png" alt="image-20201130231617575"></p>
+<p>​    该图便是本例中无向图模型的因子表。其中先注意到A与B之间的因子。 因子值表示的是两个值之间的兼容程度(第一行就表示的是$a^0和b^0$的兼容程度为30)，其中我们可以看到似乎$a^0和b^0$的因子值最大，说明它们最兼容，那么这种情况的可能性是最高的吗？在探讨这个问题之前，我们需要引入无向图上的因子分解来进行计算。</p>
+<h2 id="1-4-无向图上的因子分解"><a href="#1-4-无向图上的因子分解" class="headerlink" title="1.4 无向图上的因子分解"></a>1.4 无向图上的因子分解</h2><p>​    <strong>定义2：</strong>令X，Y和Z是三个不相交的变量集，且令$\phi_1(X,Y)$和$\phi_2(Y,Z)$是两个因子。因子的乘积$\phi_1 \cdot \phi_2$定义为如下所示的一个新的因子$\psi:Val(X,Y,Z)\rightarrow R：$</p>
+<script type="math/tex; mode=display">
+\psi(X,Y,Z)=\phi_1(X,Y)\cdot\phi_2(Y,Z)</script><pre><code> 正如已经看到的，CPD和联合概率分布都是银子。实际上，贝叶斯网的链式法则将联合概率分布的因子定义为CPD因子的乘积。例如，当计算$P(A,B)=P(A)P(B|A)$时，我们总是将$P(A)$和$P(B|A)$的概率分布表中的A的值相同的表值相乘。因此如果令$\phi_&#123;X_i&#125;(X_i,X_&#123;\pi_i&#125;)$表示$P(X_i|X_&#123;\pi_i&#125;)$，那么
+</code></pre><script type="math/tex; mode=display">
+P(X_1,...,X_n)=\prod_i\phi_{X_i}</script><p>​    下面是条件概率的链式法则：</p>
+<script type="math/tex; mode=display">
+P(X_1,...,X_n)=\prod_iP(X_i|X_{\pi_i})</script><p>​    我们仿造一下，将$\phi<em>{X_i}(X_i,X</em>{\pi<em>i})$表示，$P(X_i,X</em>{\pi_i})$，那我们则有：</p>
+<script type="math/tex; mode=display">
+P(X_1,...,X_n)=\prod_i\phi X_i</script><p>​    在马尔可夫网中对因子的计算定义了上面的式子。值得注意的是注意的是两个因子都有共有部分Y。为什么要这样定义呢？是由于在概率图模型的理论下，贝叶斯网和马尔可夫网应当是相关联的，为了发展统一的理论，而仿造贝叶斯网中条件概率的链式法则，定义了因子相乘的操作，由此可以在很多问题上统一解决两个网络下的情形。</p>
+<p>​    根据上面的两个定义，我们再回到事例。</p>
+<p>​    根据图，我们可以将因子化为：</p>
+<script type="math/tex; mode=display">
+\hat P(a,b,c,d)=\phi_1(a,b)*\phi_2(b,c)*\phi_3(c,d)*\phi_4(d,a)</script><p>​    这里为什么要加hat，因为严格来说这不是一个联合概率，因为其值不在01区间内，因此我们要将其<strong>归一化</strong>，引入Z：</p>
+<script type="math/tex; mode=display">
+Z=\sum_{a,b,c,d}\phi_1(a,b)*\phi_2(b,c)*\phi_3(c,d)*\phi_4(d,a)</script><p>​    最终得到的联合概率为：</p>
+<script type="math/tex; mode=display">
+P(a,b,c,d)=\frac{1}{Z}\phi_1(a,b)*\phi_2(b,c)*\phi_3(c,d)*\phi_4(d,a)</script><p>​    经过计算，我们得到：</p>
+<p><img src="https://i.loli.net/2020/12/01/MvCkOewSm6HWnVJ.png" alt="image-20201201000253370"></p>
+<p>​    我们可以通过这个概率表来得出b误解概念的概率（b1）约等于0.732，不误解的概率约为0.268.并且可以观察到P(b1|c0)约等于0.06。这说明什么呢，利用因子的方法我们也能够在无向图中求出边缘概率，条件概率。</p>
+<p>​    然后，我们还可以从图中发现一些性质。</p>
+<p>​    可以看到原本a和b似乎意见相同的趋势更高，但是算出联合概率后发现似乎a与b意见相反的概率更高。这是为什么呢？因为A与D意见十分相同，B与C的意见十分相同。并且所以D与C的意见极度不和，然后通过这传导到了A和B。因此，在四个人的大背景下，ab两人的意见极大概率是相左的。</p>
+<h1 id="2-参数化"><a href="#2-参数化" class="headerlink" title="2 参数化"></a>2 参数化</h1><h2 id="2-1-因子和因子的计算"><a href="#2-1-因子和因子的计算" class="headerlink" title="2.1 因子和因子的计算"></a>2.1 因子和因子的计算</h2><p>​    上一节定义过的因子。</p>
+<p><img src="https://i.loli.net/2020/12/01/NK79MZqXLW5POJE.png" alt="image-20201201000930661"></p>
+<p><img src="https://i.loli.net/2020/12/01/PvhNngHClkasj8A.png" alt="image-20201201000947885">    </p>
+<p>该图中可以看到我们将两个因子组成了一个新的因子。那我们在一张图中有什么样的方法或规则去组合呢？接下来我们要引入一个新的概念。</p>
+<h2 id="2-2-团-Clique"><a href="#2-2-团-Clique" class="headerlink" title="2.2 团(Clique)"></a>2.2 团(Clique)</h2><p><strong>定义3：</strong>集合中任意两个节点都互相连接即为<strong>团（clique）</strong>。</p>
+<p><strong>定义4：</strong>如果一个团不被其他任一团所包含，即它不是其他任一团的真子集，则称该团为图G的<strong>极大团（maximal clique）</strong>。或者说再网团中加入任意一个节点，该集合都不再是团，则这个原先的团是极大团。</p>
+<p><img src="https://i.loli.net/2020/12/01/cXgfnHOC78oiFQM.png" alt="image-20201201001133405"></p>
+<p>上图便是一个无向图，则图中所有的极大团为：</p>
+<p><img src="https://i.loli.net/2020/12/01/jROFuWmHoSAxKJl.png" alt="image-20201201001209388"></p>
+<p>​    可以看到这张图中的极大团有哪些呢？「0，5」显然是团但不是极大团，因为「0，5，4」也是团且包含「0，5」。那么这个团有什么作用呢？我们可以直观理解，每一个团都可以被<strong>一个因子</strong>联系起来。<strong>（示例每一个团都可以被一个因子包含）</strong>。根据团与团与极大团的定义，我们可以最优的紧凑图中的因子。（如果按照最开始的成对马尔可夫网来计算，就是每条边含有一个因子的。那么我们需要8个因子想乘，如果换成极大团以后，我们只需要4个因子相乘了）</p>
+<h2 id="2-3-吉布斯分布（Gibbs-Distribution）"><a href="#2-3-吉布斯分布（Gibbs-Distribution）" class="headerlink" title="2.3 吉布斯分布（Gibbs Distribution）"></a>2.3 吉布斯分布（Gibbs Distribution）</h2><h3 id="2-3-1-Gibbs分布的定义："><a href="#2-3-1-Gibbs分布的定义：" class="headerlink" title="2.3.1 Gibbs分布的定义："></a>2.3.1 Gibbs分布的定义：</h3><p>​    给一个无向图H和图H中的所有最大团因子\psi_C，我们说P(x_1,…,x_n)是图H上的一个Gibbs分布：</p>
+<p><img src="https://i.loli.net/2020/12/01/HQbw31ToLYMOZ6p.png" alt="image-20201201001337944"></p>
+<p>​    联合概率$P(X）$可以由极大团来定义。这个等式不是凭空而来，而是由<strong>Hammersley-Clifford定理</strong>证明而来的。</p>
+<p>​    通俗来说，<strong>Gibbs分布</strong>就是利用<strong>因子</strong>来表示无向图模型的概率分布。这也就是利用<strong>无向图模型</strong>表示<strong>联合概率</strong>的方式。</p>
+<p>​    将概率无向图模型的<strong>联合概率分布</strong>表示为其<strong>最大团上的随机变量的函数的乘积形式</strong>的操作，称为概率无向图模型的<strong>因子分解。</strong></p>
+<h1 id="3-马尔可夫网的独立性"><a href="#3-马尔可夫网的独立性" class="headerlink" title="3 马尔可夫网的独立性"></a>3 马尔可夫网的独立性</h1><h2 id="3-1-贝叶斯网中的独立性回顾"><a href="#3-1-贝叶斯网中的独立性回顾" class="headerlink" title="3.1 贝叶斯网中的独立性回顾"></a>3.1 贝叶斯网中的独立性回顾</h2><p>在有向图中的局部我们有三种类型的独立性划分。</p>
+<p><img src="https://i.loli.net/2020/12/01/jwz1PGspxBYoAad.png" alt="image-20201201001511287"></p>
+<p>那我们在<strong>无向图</strong>中有没有类似的可以从图中读出条件独立性的方式呢？</p>
+<p>有三个。</p>
+<h2 id="3-2-无向图中的条件独立性"><a href="#3-2-无向图中的条件独立性" class="headerlink" title="3.2 无向图中的条件独立性"></a>3.2 无向图中的条件独立性</h2><h3 id="3-2-1-全局马尔可夫性（global-Markov-property）"><a href="#3-2-1-全局马尔可夫性（global-Markov-property）" class="headerlink" title="3.2.1 全局马尔可夫性（global Markov property）"></a>3.2.1 全局马尔可夫性（global Markov property）</h3><p><img src="https://i.loli.net/2020/12/01/O4ajm8VxtliBwu6.png" alt="image-20201201001634651"></p>
+<p><img src="https://i.loli.net/2020/12/01/35PqStEbolZw9dx.png" alt="image-20201201001645535"></p>
+<p>简化后：</p>
+<p><img src="https://i.loli.net/2020/12/01/DTSQzVGOpr8w1lo.png" alt="image-20201201001704368"></p>
+<p>​    定义4.8定义了一条路径的所有节点在不被观测的情况下是有效路径。</p>
+<p>​    定义4.9定义了如果集合X和集合Y之间没有路径，则X，Y关于Z独立。</p>
+<h3 id="3-2-2-局部马尔可夫性-local-Markov-property"><a href="#3-2-2-局部马尔可夫性-local-Markov-property" class="headerlink" title="3.2.2 局部马尔可夫性(local Markov property)"></a>3.2.2 局部马尔可夫性(local Markov property)</h3><p><img src="https://i.loli.net/2020/12/01/AlROFWh37J9Gier.png" alt="image-20201201001757274"></p>
+<p><img src="https://i.loli.net/2020/12/01/VWrbSOa2qcpDFYs.png" alt="image-20201201001805640"></p>
+<h3 id="3-2-3-成对马尔可夫性-pairwise-Markov-property"><a href="#3-2-3-成对马尔可夫性-pairwise-Markov-property" class="headerlink" title="3.2.3 成对马尔可夫性(pairwise Markov property)"></a>3.2.3 成对马尔可夫性(pairwise Markov property)</h3><p><img src="https://i.loli.net/2020/12/01/j8euHXVpbYzwnEm.png" alt="image-20201201001831599"></p>
+<p><img src="https://i.loli.net/2020/12/01/VB5iKC2dJuXaEjt.png" alt="image-20201201001843318"></p>
+<p>给定两个不相邻的变量，则这两个变量关于其他变量条件独立。</p>
+<h3 id="3-2-4-马尔可夫网与无向图中独立性"><a href="#3-2-4-马尔可夫网与无向图中独立性" class="headerlink" title="3.2.4 马尔可夫网与无向图中独立性"></a>3.2.4 马尔可夫网与无向图中独立性</h3><p>马尔可夫网中有三个独立性：</p>
+<ul>
+<li>全局马尔科夫性。</li>
+<li>局部马尔科夫性。</li>
+<li>成对马尔科夫性。</li>
+</ul>
+<p>这三种独立性经过证明关于<strong>正分布是等价</strong>的。</p>
+<p><strong>马尔可夫网</strong>：设有联合概率分布 P(Y) ，由无向图 G=(V,E) 表示，在图 G 中，结点表示随机变量，边表示随机变量之间的依赖关系。如果联合概率分布 P(Y) 满足成对、局部或全局马尔可夫性，就称此联合概率分布为概率无向图模型或马尔可夫网。</p>
+<p>马尔科夫网的概率分布一定可以表示成最大团们上的非负函数乘积形式。</p>
+<p>Hammersley Clifford Theorem理论认为，马尔科夫网和Gibbs分布是一致的。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">sheep</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2020/12/01/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%BB%9C/">http://example.com/2020/12/01/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%BB%9C/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">NlsHeep</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%9B%BE%E6%A8%A1%E5%9E%8B/">图模型</a><a class="post-meta__tags" href="/tags/%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C/">贝叶斯网络</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/12/01/BevL8YWIQlkKgjp.png" data-sites="wechat,qq,weibo,twitter,facebook"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2020/11/29/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%BA%8C%E7%AB%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C/"><img class="next-cover" src="https://i.loli.net/2020/11/29/gOKmvQaVh6CrRtd.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【图模型】第二章-贝叶斯网络</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2020/11/29/【图模型】第二章贝叶斯网络/" title="【图模型】第二章-贝叶斯网络"><img class="cover" src="https://i.loli.net/2020/11/29/gOKmvQaVh6CrRtd.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-11-29</div><div class="title">【图模型】第二章-贝叶斯网络</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside_content" id="aside_content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><img class="avatar-img" src="/img/IMG_4725.JPG" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">sheep</div><div class="author-info__description"></div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/nlsheep"><i class="fab fa-github"></i><span>关注我的github</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/NlsHeep" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="/1748823812@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div></div><div class="card-widget card-announcement"><div class="card-content"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">欢迎光临。</div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="card-content"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E8%AF%AF%E8%A7%A3%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.</span> <span class="toc-text">1 误解示例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E4%BE%8B%E5%AD%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 例子：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E6%97%A0%E5%90%91%E5%9B%BE%E6%A8%A1%E5%9E%8B%E6%9D%A5%E6%8F%8F%E8%BF%B0%E8%AF%A5%E4%BE%8B"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 无向图模型来描述该例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E5%9B%A0%E5%AD%90-factor"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 因子(factor)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E6%97%A0%E5%90%91%E5%9B%BE%E4%B8%8A%E7%9A%84%E5%9B%A0%E5%AD%90%E5%88%86%E8%A7%A3"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 无向图上的因子分解</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%8F%82%E6%95%B0%E5%8C%96"><span class="toc-number">2.</span> <span class="toc-text">2 参数化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E5%9B%A0%E5%AD%90%E5%92%8C%E5%9B%A0%E5%AD%90%E7%9A%84%E8%AE%A1%E7%AE%97"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 因子和因子的计算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E5%9B%A2-Clique"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 团(Clique)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E5%90%89%E5%B8%83%E6%96%AF%E5%88%86%E5%B8%83%EF%BC%88Gibbs-Distribution%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 吉布斯分布（Gibbs Distribution）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-Gibbs%E5%88%86%E5%B8%83%E7%9A%84%E5%AE%9A%E4%B9%89%EF%BC%9A"><span class="toc-number">2.3.1.</span> <span class="toc-text">2.3.1 Gibbs分布的定义：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%9A%84%E7%8B%AC%E7%AB%8B%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">3 马尔可夫网的独立性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E4%B8%AD%E7%9A%84%E7%8B%AC%E7%AB%8B%E6%80%A7%E5%9B%9E%E9%A1%BE"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 贝叶斯网中的独立性回顾</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%97%A0%E5%90%91%E5%9B%BE%E4%B8%AD%E7%9A%84%E6%9D%A1%E4%BB%B6%E7%8B%AC%E7%AB%8B%E6%80%A7"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 无向图中的条件独立性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-1-%E5%85%A8%E5%B1%80%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%80%A7%EF%BC%88global-Markov-property%EF%BC%89"><span class="toc-number">3.2.1.</span> <span class="toc-text">3.2.1 全局马尔可夫性（global Markov property）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-2-%E5%B1%80%E9%83%A8%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%80%A7-local-Markov-property"><span class="toc-number">3.2.2.</span> <span class="toc-text">3.2.2 局部马尔可夫性(local Markov property)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-3-%E6%88%90%E5%AF%B9%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%80%A7-pairwise-Markov-property"><span class="toc-number">3.2.3.</span> <span class="toc-text">3.2.3 成对马尔可夫性(pairwise Markov property)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-4-%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E4%B8%8E%E6%97%A0%E5%90%91%E5%9B%BE%E4%B8%AD%E7%8B%AC%E7%AB%8B%E6%80%A7"><span class="toc-number">3.2.4.</span> <span class="toc-text">3.2.4 马尔可夫网与无向图中独立性</span></a></li></ol></li></ol></li></ol></div></div></div><div class="card-widget card-recent-post"><div class="card-content"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2020/12/01/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%BB%9C/" title="【图模型】第三章-马尔可夫网络"><img src="https://i.loli.net/2020/12/01/BevL8YWIQlkKgjp.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【图模型】第三章-马尔可夫网络"/></a><div class="content"><a class="title" href="/2020/12/01/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E7%BD%91%E7%BB%9C/" title="【图模型】第三章-马尔可夫网络">【图模型】第三章-马尔可夫网络</a><time datetime="2020-11-30T16:22:12.000Z" title="发表于 2020-12-01 00:22:12">2020-12-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/29/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%BA%8C%E7%AB%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C/" title="【图模型】第二章-贝叶斯网络"><img src="https://i.loli.net/2020/11/29/gOKmvQaVh6CrRtd.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【图模型】第二章-贝叶斯网络"/></a><div class="content"><a class="title" href="/2020/11/29/%E3%80%90%E5%9B%BE%E6%A8%A1%E5%9E%8B%E3%80%91%E7%AC%AC%E4%BA%8C%E7%AB%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C/" title="【图模型】第二章-贝叶斯网络">【图模型】第二章-贝叶斯网络</a><time datetime="2020-11-29T10:46:00.000Z" title="发表于 2020-11-29 18:46:00">2020-11-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/25/leetcode1370/" title="【LeetCode每日】1370.上升下降字符串"><img src="/img/leetcode.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【LeetCode每日】1370.上升下降字符串"/></a><div class="content"><a class="title" href="/2020/11/25/leetcode1370/" title="【LeetCode每日】1370.上升下降字符串">【LeetCode每日】1370.上升下降字符串</a><time datetime="2020-11-24T16:11:29.000Z" title="发表于 2020-11-25 00:11:29">2020-11-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/24/leetcode222/" title="【LeetCode每日】222.完全二叉树的节点个数"><img src="/img/leetcode.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【LeetCode每日】222.完全二叉树的节点个数"/></a><div class="content"><a class="title" href="/2020/11/24/leetcode222/" title="【LeetCode每日】222.完全二叉树的节点个数">【LeetCode每日】222.完全二叉树的节点个数</a><time datetime="2020-11-24T15:52:03.000Z" title="发表于 2020-11-24 23:52:03">2020-11-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/11/23/leetcode452/" title="【LeetCode每日】452.用最少数量的箭引爆气球"><img src="/img/leetcode.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【LeetCode每日】452.用最少数量的箭引爆气球"/></a><div class="content"><a class="title" href="/2020/11/23/leetcode452/" title="【LeetCode每日】452.用最少数量的箭引爆气球">【LeetCode每日】452.用最少数量的箭引爆气球</a><time datetime="2020-11-23T14:23:02.000Z" title="发表于 2020-11-23 22:23:02">2020-11-23</time></div></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 By sheep</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a target="_blank" rel="noopener" href="https://butterfly.js.org/">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    loader: {
+      source: {
+        '[tex]/amsCd': '[tex]/amscd'
+      }
+    },
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        addClass: [200,() => {
+          document.querySelectorAll('mjx-container:not([display=\'true\']').forEach( node => {
+            const target = node.parentNode
+            if (!target.classList.contains('has-jax')) {
+              target.classList.add('mathjax-overflow')
+            }
+          })
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'hhmAIvEhOgNQgfJO7nfyJmch-gzGzoHsz',
+      appKey: 'pe4ppjAvUAs0pabJ2idN8m2Q',
+      placeholder: '记得留下邮箱哦，可以得到快速的回复',
+      avatar: 'monsterid',
+      meta: 'nick,mail'.split(','),
+      pageSize: '10',
+      lang: 'en',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign({}, initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else $.getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js', initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.querySelector('#vcomment'),loadValine)
+  else setTimeout(() => loadValine(), 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script></div></body></html>
